@@ -41,7 +41,8 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuFile.menuAction())
         self.actionOpen.setShortcut("Ctrl+O")
         self.actionOpen.setStatusTip('Open File')
-        self.file = self.actionOpen.triggered.connect(self.actionOpenHandler)
+        ##self.file = self.actionOpen.triggered.connect(QFileDialog.getOpenFileName())
+
         
         self.shapeLabel = QLabel(self.centralwidget)
         shape = []
@@ -64,7 +65,7 @@ class Ui_MainWindow(object):
         self.sliderPhi.setGeometry(QtCore.QRect(400, 90, 160, 16))
         self.sliderPhi.setOrientation(QtCore.Qt.Horizontal)
         self.sliderPhi.setObjectName("sliderPhi")
-        self.sliderPhi.setMaximum(phi)
+        self.sliderPhi.setMaximum(phi-1)
         self.labelTitlePhi = QLabel(self.centralwidget)
         self.labelTitlePhi.move(400,65)
         self.labelTitlePhi.setText("Phi")
@@ -78,7 +79,7 @@ class Ui_MainWindow(object):
         self.sliderTheta.setGeometry(QtCore.QRect(400, 150, 160, 16))
         self.sliderTheta.setOrientation(QtCore.Qt.Horizontal)
         self.sliderTheta.setObjectName("sliderTheta")
-        self.sliderTheta.setMaximum(theta)
+        self.sliderTheta.setMaximum(theta-1)
         self.labelTitleTheta = QLabel(self.centralwidget)
         self.labelTitleTheta.move(400,125)
         self.labelTitleTheta.setText("Theta")
@@ -92,6 +93,14 @@ class Ui_MainWindow(object):
         self.sc = MplCanvas(self.centralwidget, width=4, height=4, dpi=100)       
         self.sc.axes.imshow(data[...,self.sliderPhi.value(),self.sliderTheta.value()])
         self.sc.show()
+        
+        self.sc1 = MplCanvas(self.centralwidget, width=4, height=4, dpi=100) 
+        self.sc1.axes.imshow(data[5,5,...])
+        self.sc1.show()
+
+        
+        self.sliderPhi.valueChanged.connect(self.update_plot)
+        self.sliderTheta.valueChanged.connect(self.update_plot)
         layout = QtWidgets.QHBoxLayout(self.centralwidget)
         layout.addWidget(self.sc)
         layout2 = QtWidgets.QVBoxLayout(self.centralwidget)
@@ -108,17 +117,26 @@ class Ui_MainWindow(object):
         layout2.addWidget(self.labelTitleTheta)
         layout2.addLayout(layout4)
         layout.addLayout(layout2)
-        self.sliderPhi.valueChanged.connect(self.sc.axes.clear)
-        self.sliderPhi.valueChanged.connect(self.imageChange)
-        self.sliderTheta.valueChanged.connect(self.sc.axes.clear)
-        self.sliderTheta.valueChanged.connect(self.imageChange)
+        layout.addWidget(self.sc1)
+        
+       
 
          
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        
+
+        
+    def update_plot(self):
+        
+        self.sc.axes.cla()
+        self.sc.axes.imshow(data[...,self.sliderPhi.value(),self.sliderTheta.value()])
+        self.sc.draw()
        
     def imageChange(self):
+        self.sc = MplCanvas(self.centralwidget, width=4, height=4, dpi=100)       
         self.sc.axes.imshow(data[...,self.sliderPhi.value(),self.sliderTheta.value()])
+        self.sc.show()
 
         
 

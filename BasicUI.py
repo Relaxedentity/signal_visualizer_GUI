@@ -1,7 +1,7 @@
 import sys
 import numpy as np
 import matplotlib as plt
-from PyQt5.QtWidgets import QMainWindow, QApplication, QAction, QFileDialog, QPushButton, QLabel, QSlider, QHBoxLayout, QGroupBox, QRadioButton, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QMainWindow, QApplication, QAction, QFileDialog, QPushButton, QLabel, QSlider, QHBoxLayout, QGroupBox, QRadioButton, QVBoxLayout, QWidget,QInputDialog, QLineEdit, QMessageBox
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QIcon, QFont
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -87,6 +87,10 @@ class Ui_MainWindow(object):
         self.labelTheta.move(580, 150)
         self.labelTheta.setText("0")
         self.sliderTheta.valueChanged.connect(self.changeValueTheta)
+        self.textboxX = QLineEdit(self.centralwidget)
+        self.textboxY = QLineEdit(self.centralwidget)
+        self.coordButton = QPushButton('Press',self.centralwidget)
+        self.coordButton.clicked.connect(self.update_micro_plot)
         
        
         
@@ -95,9 +99,8 @@ class Ui_MainWindow(object):
         self.sc.show()
         
         self.sc1 = MplCanvas(self.centralwidget, width=4, height=4, dpi=100) 
-        self.sc1.axes.imshow(data[5,5,...])
         self.sc1.show()
-
+        
         
         self.sliderPhi.valueChanged.connect(self.update_plot)
         self.sliderTheta.valueChanged.connect(self.update_plot)
@@ -117,15 +120,46 @@ class Ui_MainWindow(object):
         layout2.addWidget(self.labelTitleTheta)
         layout2.addLayout(layout4)
         layout.addLayout(layout2)
-        layout.addWidget(self.sc1)
+        layout5 = QtWidgets.QVBoxLayout(self.centralwidget)
+        layout5.addWidget(self.sc1)
+        layout6 = QtWidgets.QHBoxLayout(self.centralwidget)
+        layout6.addWidget(self.textboxX)
+        layout6.addWidget(self.textboxY)
+        layout7 = QtWidgets.QVBoxLayout(self.centralwidget)
+        layout7.addLayout(layout6)
+        layout7.addWidget(self.coordButton)
+        layout5.addLayout(layout7)
+        layout.addLayout(layout5)
         
-       
+        x = 0
+        y = 0
 
+        self.text = f'x: {x},  y: {y}'
+        self.label = QLabel(self.text,self.centralwidget)
+
+        
+        
+        self.sc.setMouseTracking(True)
+
+        
+        
+        
          
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         
+    def mouseMoveEvent(self, e):
+        x = e.x()
+        y = e.y()
 
+        text = f'x: {x},  y: {y}'
+        self.label.setText(text)
+        
+    def update_micro_plot(self):
+        self.sc1.axes.cla()
+        self.sc1.axes.imshow(data[int(self.textboxX.text()),int(self.textboxY.text()),...])
+        self.sc1.draw()
+        
         
     def update_plot(self):
         

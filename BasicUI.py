@@ -14,7 +14,6 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 400)
-        
 
         
         
@@ -29,6 +28,7 @@ class Ui_MainWindow(object):
         self.menuFile.setObjectName("menuFile")
         MainWindow.setMenuBar(self.menubar)
         
+        
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
@@ -41,8 +41,9 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuFile.menuAction())
         self.actionOpen.setShortcut("Ctrl+O")
         self.actionOpen.setStatusTip('Open File')
-        ##self.file = self.actionOpen.triggered.connect(QFileDialog.getOpenFileName())
-
+        file = self.actionOpen.triggered.connect(QFileDialog.getOpenFileName()[0])
+        data = np.load(file)
+        
         
         self.shapeLabel = QLabel(self.centralwidget)
         shape = []
@@ -97,9 +98,11 @@ class Ui_MainWindow(object):
         self.sc = MplCanvas(self.centralwidget, width=4, height=4, dpi=100)       
         self.sc.axes.imshow(data[...,self.sliderPhi.value(),self.sliderTheta.value()])
         self.sc.show()
-        
+                
         self.sc1 = MplCanvas(self.centralwidget, width=4, height=4, dpi=100) 
         self.sc1.show()
+        
+        
         
         
         self.sliderPhi.valueChanged.connect(self.update_plot)
@@ -136,25 +139,21 @@ class Ui_MainWindow(object):
 
         self.text = f'x: {x},  y: {y}'
         self.label = QLabel(self.text,self.centralwidget)
+        layout2.addWidget(self.label)
 
-        
-        
-        self.sc.setMouseTracking(True)
 
-        
-        
-        
          
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         
+
     def mouseMoveEvent(self, e):
         x = e.x()
         y = e.y()
 
         text = f'x: {x},  y: {y}'
         self.label.setText(text)
-        
+    
     def update_micro_plot(self):
         self.sc1.axes.cla()
         self.sc1.axes.imshow(data[int(self.textboxX.text()),int(self.textboxY.text()),...])
@@ -180,8 +179,6 @@ class Ui_MainWindow(object):
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.actionOpen.setText(_translate("MainWindow", "Open"))
         
-    def actionOpenHandler(self):
-        file = QFileDialog.getOpenFileName()
 
         
     def initUI(self):
@@ -197,6 +194,8 @@ class Ui_MainWindow(object):
         typeLabel.setText("Data Type: "+','.join(str(d) for d in dataType))
         typeLabel.adjustSize()
         typeLabel.move(300, 200)
+        self.setMouseTracking(True)
+        
         
     def changeValuePhi(self):
         size = self.sliderPhi.value()

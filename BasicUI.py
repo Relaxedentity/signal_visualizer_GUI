@@ -73,11 +73,7 @@ class Ui_MainWindow(object):
         self.sliderTheta.valueChanged.connect(self.changeValueTheta)
         self.sliderTheta.valueChanged.connect(self.update_plot)
         
-        # Text box and button
-        self.textboxX = QLineEdit(self.centralwidget)
-        self.textboxY = QLineEdit(self.centralwidget)
-        self.coordButton = QPushButton('Press',self.centralwidget)
-        self.coordButton.clicked.connect(self.update_micro_plot)
+
         
         # Micrograph images display
         self.sc = MplCanvas(self.centralwidget, width=4, height=4, dpi=100)   
@@ -108,21 +104,45 @@ class Ui_MainWindow(object):
         layout.addLayout(layout2)
         layout5 = QtWidgets.QVBoxLayout(self.centralwidget)
         layout5.addWidget(self.sc1)
-        layout6 = QtWidgets.QHBoxLayout(self.centralwidget)
-        layout6.addWidget(self.textboxX)
-        layout6.addWidget(self.textboxY)
-        layout7 = QtWidgets.QVBoxLayout(self.centralwidget)
-        layout7.addLayout(layout6)
-        layout7.addWidget(self.coordButton)
-        layout5.addLayout(layout7)
         layout.addLayout(layout5)
         
-        x = 0
-        y = 0
+        #Mouse-tracking events
+        self.sc.mpl_connect("button_press_event", self.on_press)
+        self.sc.mpl_connect("button_release_event", self.on_release)
+        self.sc.mpl_connect("motion_notify_event", self.on_move)
+        
+        
+    def on_press(self, event):
+        print("press")
+        print("event.xdata", event.xdata)
+        print("event.ydata", event.ydata)
+        print("event.inaxes", event.inaxes)
+        print("x", event.x)
+        print("y", event.y)
 
-        self.text = f'x: {x},  y: {y}'
-        self.label = QLabel(self.text,self.centralwidget)
-        layout2.addWidget(self.label)
+    def on_release(self, event):
+        print("release:")
+        print("event.xdata", event.xdata)
+        print("event.ydata", event.ydata)
+        print("event.inaxes", event.inaxes)
+        print("x", event.x)
+        print("y", event.y)
+
+    def on_move(self, event):
+        print("move")
+        print("event.xdata", event.xdata)
+        print("event.ydata", event.ydata)
+        print("event.inaxes", event.inaxes)
+        print("x", event.x)
+        print("y", event.y)
+        
+        #Micro-Plot Update
+        self.sc1.axes.cla()
+        self.sc1.axes.imshow(self.data[event.x, event.y,...])
+        self.sc1.axes.set_xticks([])
+        self.sc1.axes.set_yticks([])
+        self.sc1.draw()
+
         
     def dataOpen(self):
         # Load data from file dialog
@@ -130,6 +150,7 @@ class Ui_MainWindow(object):
         
         phi = self.data.shape[2]
         theta = self.data.shape[3]
+        print (self.data.shape)
         
         # Set maximums of sliders
         self.sliderPhi.setMaximum(phi-1)
@@ -147,12 +168,7 @@ class Ui_MainWindow(object):
         text = f'x: {x},  y: {y}'
         self.label.setText(text)
     
-    def update_micro_plot(self):
-        self.sc1.axes.cla()
-        self.sc1.axes.imshow(self.data[int(self.textboxX.text()),int(self.textboxY.text()),...])
-        self.sc1.axes.set_xticks([])
-        self.sc1.axes.set_yticks([])
-        self.sc1.draw()
+
         
     def update_plot(self):
         self.sc.axes.cla()
@@ -212,4 +228,3 @@ if __name__ == "__main__":
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
-

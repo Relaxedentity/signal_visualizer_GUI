@@ -157,10 +157,12 @@ class Ui_MainWindow(object):
         self.sliderTheta.setMaximum(theta-1)
         
         # Initialiye micrographs image
-        # self.sc.axes.imshow(self.data[...,self.sliderPhi.value(),self.sliderTheta.value()])
-        # self.sc.axes.set_xticks([])
-        # self.sc.axes.set_yticks([])
-        # self.sc.show()
+        self.sc.axes.cla()
+        self.sc.axes.imshow(self.data[...,self.sliderPhi.value(),self.sliderTheta.value()],interpolation='nearest', aspect='auto')
+        self.sc.axes.figsize = (30,30)
+        self.sc.axes.set_xticks([])
+        self.sc.axes.set_yticks([])
+        self.sc.draw()
 
     def mouseMoveEvent(self, e):
         x = e.x()
@@ -216,7 +218,7 @@ class Ui_MainWindow(object):
         self.labelTheta.adjustSize()
         
 class MplCanvas(FigureCanvasQTAgg):
-    def __init__(self, parent=None, width=5, height=4, dpi=100):
+    def __init__(self, parent=None, width=4, height=4, dpi=100):
         fig = Figure(figsize=(width, height), dpi=dpi)
         self.axes = fig.add_subplot(111)
         super(MplCanvas, self).__init__(fig)
